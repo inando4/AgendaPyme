@@ -1,0 +1,419 @@
+/* Componente de Reservas - Mobile-First usando Tailwind */
+@import "tailwindcss";
+
+/* === MODAL OVERLAY === */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center p-3 z-50;
+  @apply sm:p-4;
+}
+
+.modal-container {
+  @apply w-full max-w-sm;
+  @apply sm:max-w-md;
+  @apply lg:max-w-lg;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl w-full max-h-screen overflow-y-auto;
+  @apply sm:rounded-xl;
+}
+
+/* === HEADER DEL MODAL === */
+.modal-header {
+  @apply flex justify-between items-start p-4 border-b border-gray-200;
+  @apply sm:p-6;
+}
+
+.header-info {
+  @apply flex-1;
+}
+
+.modal-title {
+  @apply text-lg font-bold text-gray-900 mb-1;
+  @apply sm:text-xl;
+}
+
+.modal-subtitle {
+  @apply text-sm text-gray-600;
+  @apply sm:text-base;
+}
+
+.close-btn {
+  @apply w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors ml-4;
+  @apply sm:w-10 sm:h-10;
+}
+
+/* === INDICADOR DE PASOS === */
+.steps-indicator {
+  @apply flex items-center justify-between px-4 py-3 bg-gray-50;
+  @apply sm:px-6 sm:py-4;
+}
+
+.step {
+  @apply flex flex-col items-center cursor-pointer transition-all duration-200;
+  @apply sm:flex-row sm:space-x-2;
+}
+
+.step.active .step-number {
+  @apply bg-blue-600 text-white;
+}
+
+.step.completed .step-number {
+  @apply bg-green-600 text-white;
+}
+
+.step-number {
+  @apply w-6 h-6 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-xs font-medium mb-1;
+  @apply sm:w-8 sm:h-8 sm:text-sm sm:mb-0;
+}
+
+.step-label {
+  @apply text-xs text-gray-600;
+  @apply sm:text-sm;
+}
+
+.step.active .step-label {
+  @apply text-blue-600 font-medium;
+}
+
+.step.completed .step-label {
+  @apply text-green-600;
+}
+
+.step-connector {
+  @apply flex-1 h-px bg-gray-300 mx-2;
+  @apply sm:mx-3;
+}
+
+.step-connector.active {
+  @apply bg-blue-600;
+}
+
+/* === BODY DEL MODAL === */
+.modal-body {
+  @apply p-4;
+  @apply sm:p-6;
+}
+
+.step-content {
+  @apply space-y-4;
+  @apply sm:space-y-6;
+}
+
+.step-title {
+  @apply text-base font-semibold text-gray-900 flex items-center mb-4;
+  @apply sm:text-lg;
+}
+
+/* === ESTADOS DE CARGA === */
+.loading-state {
+  @apply text-center py-6;
+  @apply sm:py-8;
+}
+
+.empty-state {
+  @apply text-center py-6 text-gray-500;
+  @apply sm:py-8;
+}
+
+/* === SERVICIOS GRID === */
+.servicios-grid {
+  @apply space-y-3;
+  @apply sm:space-y-4;
+}
+
+.servicio-card {
+  @apply flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200;
+  @apply sm:p-4;
+}
+
+.servicio-info {
+  @apply flex-1;
+}
+
+.servicio-name {
+  @apply font-medium text-gray-900 text-sm mb-1;
+  @apply sm:text-base;
+}
+
+.servicio-description {
+  @apply text-xs text-gray-600 mb-2;
+  @apply sm:text-sm;
+}
+
+.servicio-meta {
+  @apply flex items-center space-x-3 text-xs text-gray-500;
+  @apply sm:text-sm;
+}
+
+.servicio-duration,
+.servicio-price {
+  @apply flex items-center;
+}
+
+.servicio-action {
+  @apply text-gray-400 ml-3;
+  @apply sm:ml-4;
+}
+
+/* === BADGES DE SERVICIO === */
+.selected-service {
+  @apply flex items-center space-x-2 mb-4 flex-wrap;
+}
+
+.service-badge {
+  @apply bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium;
+  @apply sm:px-3 sm:text-sm;
+}
+
+.service-duration {
+  @apply bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs;
+  @apply sm:px-3 sm:text-sm;
+}
+
+.selected-info {
+  @apply flex items-center space-x-2 mb-4 flex-wrap;
+}
+
+.date-badge {
+  @apply bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium;
+  @apply sm:px-3 sm:text-sm;
+}
+
+/* === FECHAS GRID === */
+.fechas-grid {
+  @apply grid grid-cols-2 gap-3;
+  @apply sm:grid-cols-3;
+  @apply lg:grid-cols-4;
+}
+
+.fecha-card {
+  @apply border border-gray-200 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-all duration-200 text-center;
+  @apply sm:p-4;
+}
+
+.fecha-info {
+  @apply space-y-1;
+}
+
+.fecha-day {
+  @apply text-lg font-bold text-gray-900;
+  @apply sm:text-xl;
+}
+
+.fecha-weekday {
+  @apply text-xs text-gray-600 capitalize;
+  @apply sm:text-sm;
+}
+
+.fecha-badges {
+  @apply flex justify-center mt-2;
+}
+
+.fecha-badge {
+  @apply bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-medium;
+}
+
+.fecha-action {
+  @apply text-gray-400 mt-2;
+}
+
+/* === HORARIOS GRID === */
+.horarios-grid {
+  @apply grid grid-cols-2 gap-3;
+  @apply sm:grid-cols-3;
+  @apply lg:grid-cols-4;
+}
+
+.horario-card {
+  @apply border border-gray-200 rounded-lg p-3 cursor-pointer transition-all duration-200 text-center;
+  @apply sm:p-4;
+}
+
+.horario-card:not(.disabled):hover {
+  @apply bg-gray-50 border-blue-300;
+}
+
+.horario-card.disabled {
+  @apply opacity-50 cursor-not-allowed bg-gray-100;
+}
+
+.horario-time {
+  @apply text-base font-bold text-gray-900 mb-1;
+  @apply sm:text-lg;
+}
+
+.horario-status {
+  @apply text-xs;
+  @apply sm:text-sm;
+}
+
+.status-available {
+  @apply text-green-600 font-medium;
+}
+
+.status-occupied {
+  @apply text-red-600 font-medium;
+}
+
+/* === RESUMEN DE RESERVA === */
+.reserva-summary {
+  @apply space-y-4;
+  @apply sm:space-y-6;
+}
+
+.summary-section {
+  @apply bg-gray-50 rounded-lg p-4;
+  @apply sm:p-6;
+}
+
+.summary-title {
+  @apply font-semibold text-gray-900 mb-4 text-sm;
+  @apply sm:text-base;
+}
+
+.summary-item {
+  @apply flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0;
+}
+
+.summary-item--total {
+  @apply pt-3 border-t-2 border-gray-300 font-semibold text-base;
+  @apply sm:text-lg;
+}
+
+.summary-label {
+  @apply text-sm text-gray-600;
+  @apply sm:text-base;
+}
+
+.summary-value {
+  @apply text-sm font-medium text-gray-900;
+  @apply sm:text-base;
+}
+
+/* === NOTAS === */
+.notes-section {
+  @apply space-y-2;
+}
+
+.notes-label {
+  @apply block text-sm font-medium text-gray-700;
+  @apply sm:text-base;
+}
+
+.notes-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm;
+  @apply sm:px-4 sm:py-3 sm:text-base;
+}
+
+/* === ALERTAS === */
+.alert {
+  @apply flex items-center p-3 rounded-lg mb-4 text-sm;
+  @apply sm:p-4 sm:text-base;
+}
+
+.alert--error {
+  @apply bg-red-50 text-red-800 border border-red-200;
+}
+
+.alert--success {
+  @apply bg-green-50 text-green-800 border border-green-200;
+}
+
+/* === FOOTER DEL MODAL === */
+.modal-footer {
+  @apply flex items-center justify-between p-4 border-t border-gray-200 space-x-3;
+  @apply sm:p-6;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center text-sm;
+  @apply sm:px-6 sm:py-3 sm:text-base;
+}
+
+.btn--secondary {
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+}
+
+.btn--primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* === ANIMACIONES === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.step-content {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* === MEJORAS TÁCTILES === */
+.servicio-card,
+.fecha-card,
+.horario-card,
+.close-btn,
+.btn {
+  @apply touch-manipulation;
+}
+
+/* === FOCUS STATES === */
+.servicio-card:focus,
+.fecha-card:focus,
+.horario-card:focus,
+.btn:focus,
+.notes-input:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* === SAFE AREAS === */
+@supports (padding: max(0px)) {
+  .modal-overlay {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* === RESPONSIVE BREAKPOINTS === */
+@media (max-width: 640px) {
+  .fechas-grid {
+    @apply grid-cols-2;
+  }
+  
+  .horarios-grid {
+    @apply grid-cols-2;
+  }
+  
+  .modal-footer {
+    @apply flex-col space-y-2 space-x-0;
+  }
+  
+  .btn {
+    @apply w-full justify-center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-container {
+    @apply max-w-2xl;
+  }
+  
+  .fechas-grid {
+    @apply grid-cols-5;
+  }
+  
+  .horarios-grid {
+    @apply grid-cols-5;
+  }
+}

@@ -1,0 +1,260 @@
+<div *ngIf="mostrarModal" class="modal-overlay" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <div class="modal-content">
+      
+      <!-- Header del Modal -->
+      <div class="modal-header">
+        <div class="header-info">
+          <h2 class="modal-title">
+            <i class="fas fa-calendar-plus mr-2"></i>
+            Agendar Cita
+          </h2>
+          <p class="modal-subtitle" *ngIf="negocio">{{negocio.nombre}}</p>
+        </div>
+        <button (click)="cerrarReservas()" class="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Indicador de Pasos -->
+      <div class="steps-indicator">
+        <div class="step" [class.active]="paso >= 1" [class.completed]="paso > 1" (click)="irAPaso(1)">
+          <div class="step-number">1</div>
+          <span class="step-label">Servicio</span>
+        </div>
+        <div class="step-connector" [class.active]="paso > 1"></div>
+        <div class="step" [class.active]="paso >= 2" [class.completed]="paso > 2" (click)="irAPaso(2)">
+          <div class="step-number">2</div>
+          <span class="step-label">Fecha</span>
+        </div>
+        <div class="step-connector" [class.active]="paso > 2"></div>
+        <div class="step" [class.active]="paso >= 3" [class.completed]="paso > 3" (click)="irAPaso(3)">
+          <div class="step-number">3</div>
+          <span class="step-label">Horario</span>
+        </div>
+        <div class="step-connector" [class.active]="paso > 3"></div>
+        <div class="step" [class.active]="paso >= 4">
+          <div class="step-number">4</div>
+          <span class="step-label">Confirmar</span>
+        </div>
+      </div>
+
+      <!-- Contenido del Modal -->
+      <div class="modal-body">
+
+        <!-- PASO 1: Seleccionar Servicio -->
+        <div *ngIf="paso === 1" class="step-content">
+          <h3 class="step-title">
+            <i class="fas fa-concierge-bell mr-2"></i>
+            Selecciona un servicio
+          </h3>
+
+          <div *ngIf="isLoading" class="loading-state">
+            <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
+            <p>Cargando servicios...</p>
+          </div>
+
+          <div *ngIf="!isLoading && servicios.length === 0" class="empty-state">
+            <i class="fas fa-exclamation-circle text-2xl text-gray-400 mb-2"></i>
+            <p>No hay servicios disponibles</p>
+          </div>
+
+          <div *ngIf="!isLoading && servicios.length > 0" class="servicios-grid">
+            <div *ngFor="let servicio of servicios" 
+                 class="servicio-card"
+                 (click)="seleccionarServicio(servicio)">
+              <div class="servicio-info">
+                <h4 class="servicio-name">{{servicio.nombre}}</h4>
+                <p class="servicio-description">{{servicio.descripcion}}</p>
+                <div class="servicio-meta">
+                  <span class="servicio-duration">
+                    <i class="fas fa-clock mr-1"></i>
+                    {{servicio.duracion}}min
+                  </span>
+                  <span class="servicio-price">
+                    <i class="fas fa-dollar-sign mr-1"></i>
+                    S/ {{servicio.precio}}
+                  </span>
+                </div>
+              </div>
+              <div class="servicio-action">
+                <i class="fas fa-arrow-right"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASO 2: Seleccionar Fecha -->
+        <div *ngIf="paso === 2" class="step-content">
+          <h3 class="step-title">
+            <i class="fas fa-calendar-alt mr-2"></i>
+            Selecciona una fecha
+          </h3>
+
+          <div class="selected-service">
+            <span class="service-badge">{{servicioSeleccionado?.nombre}}</span>
+            <span class="service-duration">{{servicioSeleccionado?.duracion}}min</span>
+          </div>
+
+          <div *ngIf="cargandoFechas" class="loading-state">
+            <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
+            <p>Cargando fechas disponibles...</p>
+          </div>
+
+          <div *ngIf="!cargandoFechas && fechasDisponibles.length === 0" class="empty-state">
+            <i class="fas fa-calendar-times text-2xl text-gray-400 mb-2"></i>
+            <p>No hay fechas disponibles</p>
+          </div>
+
+          <div *ngIf="!cargandoFechas && fechasDisponibles.length > 0" class="fechas-grid">
+            <div *ngFor="let fecha of fechasDisponibles.slice(0, 14)" 
+                 class="fecha-card"
+                 (click)="seleccionarFecha(fecha)">
+              <div class="fecha-info">
+                <div class="fecha-day">{{formatearFechaCorta(fecha)}}</div>
+                <div class="fecha-weekday">
+                  {{formatearFecha(fecha).split(',')[0]}}
+                </div>
+                <div class="fecha-badges" *ngIf="esFechaHoy(fecha) || esFechaManana(fecha)">
+                  <span class="fecha-badge" *ngIf="esFechaHoy(fecha)">Hoy</span>
+                  <span class="fecha-badge" *ngIf="esFechaManana(fecha)">Mañana</span>
+                </div>
+              </div>
+              <div class="fecha-action">
+                <i class="fas fa-arrow-right"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASO 3: Seleccionar Horario -->
+        <div *ngIf="paso === 3" class="step-content">
+          <h3 class="step-title">
+            <i class="fas fa-clock mr-2"></i>
+            Selecciona un horario
+          </h3>
+
+          <div class="selected-info">
+            <span class="service-badge">{{servicioSeleccionado?.nombre}}</span>
+            <span class="date-badge">{{formatearFecha(fechaSeleccionada!)}}</span>
+          </div>
+
+          <div *ngIf="cargandoHorarios" class="loading-state">
+            <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
+            <p>Cargando horarios disponibles...</p>
+          </div>
+
+          <div *ngIf="!cargandoHorarios && horariosDisponibles.length === 0" class="empty-state">
+            <i class="fas fa-clock text-2xl text-gray-400 mb-2"></i>
+            <p>No hay horarios disponibles para esta fecha</p>
+          </div>
+
+          <div *ngIf="!cargandoHorarios && horariosDisponibles.length > 0" class="horarios-grid">
+            <div *ngFor="let horario of horariosDisponibles" 
+                 class="horario-card"
+                 [class.disabled]="!horario.disponible"
+                 (click)="seleccionarHorario(horario)">
+              <div class="horario-time">{{horario.hora}}</div>
+              <div class="horario-status">
+                <span *ngIf="horario.disponible" class="status-available">Disponible</span>
+                <span *ngIf="!horario.disponible" class="status-occupied">Ocupado</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASO 4: Confirmar Reserva -->
+        <div *ngIf="paso === 4" class="step-content">
+          <h3 class="step-title">
+            <i class="fas fa-check-circle mr-2"></i>
+            Confirmar reserva
+          </h3>
+
+          <div class="reserva-summary">
+            <div class="summary-section">
+              <h4 class="summary-title">Resumen de la cita</h4>
+              
+              <div class="summary-item">
+                <span class="summary-label">Servicio:</span>
+                <span class="summary-value">{{servicioSeleccionado?.nombre}}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Fecha:</span>
+                <span class="summary-value">{{formatearFecha(fechaSeleccionada!)}}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Horario:</span>
+                <span class="summary-value">{{horarioSeleccionado?.hora}}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Duración:</span>
+                <span class="summary-value">{{getDuracionTotal()}} minutos</span>
+              </div>
+
+              <div class="summary-item summary-item--total">
+                <span class="summary-label">Total:</span>
+                <span class="summary-value">S/ {{getPrecioTotal()}}</span>
+              </div>
+            </div>
+
+            <div class="notes-section">
+              <label for="notas" class="notes-label">
+                Notas adicionales (opcional)
+              </label>
+              <textarea
+                id="notas"
+                [(ngModel)]="reserva.notas"
+                class="notes-input"
+                rows="3"
+                placeholder="Información adicional para tu cita..."></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Mensajes de Error/Éxito -->
+      <div *ngIf="errorMessage" class="alert alert--error">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        {{errorMessage}}
+      </div>
+
+      <div *ngIf="successMessage" class="alert alert--success">
+        <i class="fas fa-check-circle mr-2"></i>
+        {{successMessage}}
+      </div>
+
+      <!-- Footer del Modal -->
+      <div class="modal-footer">
+        <button 
+          *ngIf="paso > 1" 
+          (click)="pasoAnterior()" 
+          class="btn btn--secondary">
+          <i class="fas fa-arrow-left mr-1"></i>
+          Anterior
+        </button>
+
+        <button 
+          *ngIf="paso < 4" 
+          (click)="cerrarReservas()" 
+          class="btn btn--secondary">
+          Cancelar
+        </button>
+
+        <button 
+          *ngIf="paso === 4" 
+          (click)="confirmarReserva()" 
+          [disabled]="isLoading"
+          class="btn btn--primary">
+          <i *ngIf="!isLoading" class="fas fa-calendar-check mr-1"></i>
+          <i *ngIf="isLoading" class="fas fa-spinner fa-spin mr-1"></i>
+          {{isLoading ? 'Creando...' : 'Confirmar Reserva'}}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,158 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <!-- Logo y título -->
+    <div class="text-center">
+      <div class="mx-auto h-16 w-16 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+        <i class="fas fa-calendar-check text-white text-2xl"></i>
+      </div>
+      <h2 class="text-4xl font-bold text-gray-900 mb-2">
+        AgendaPyme
+      </h2>
+      <p class="text-gray-600">
+        Gestiona tu negocio de forma profesional
+      </p>
+    </div>
+
+    <!-- Selector de tipo de usuario -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1">
+      <div class="flex space-x-1">
+        <button
+          type="button"
+          (click)="switchUserType('cliente')"
+          [class]="loginData.tipo === 'cliente' ? 'user-type-active' : 'user-type-inactive'"
+          class="user-type-btn">
+          <i class="fas fa-user text-lg"></i>
+          <span class="font-medium">Cliente</span>
+        </button>
+        <button
+          type="button"
+          (click)="switchUserType('negocio')"
+          [class]="loginData.tipo === 'negocio' ? 'user-type-active' : 'user-type-inactive'"
+          class="user-type-btn">
+          <i class="fas fa-store text-lg"></i>
+          <span class="font-medium">Negocio</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+      <form class="space-y-6" (ngSubmit)="onSubmit()">
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-label">
+            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+            Correo electrónico
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            [(ngModel)]="loginData.email"
+            class="form-input"
+            placeholder="correo&#64;ejemplo.com">
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password" class="form-label">
+            <i class="fas fa-lock mr-2 text-gray-400"></i>
+            Contraseña
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            [(ngModel)]="loginData.password"
+            class="form-input"
+            placeholder="••••••••">
+        </div>
+
+        <!-- Mensaje de éxito -->
+        <div *ngIf="successMessage" class="success-alert">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <i class="fas fa-check-circle text-green-500 text-xl"></i>
+            </div>
+            <div class="ml-3 flex-1">
+              <p class="text-sm font-medium text-green-800">{{ successMessage }}</p>
+              <p class="text-xs text-green-600 mt-1">
+                <i class="fas fa-spinner fa-spin mr-1"></i>
+                Redirigiendo al dashboard...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div *ngIf="errorMessage" class="error-alert">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-red-800">{{ errorMessage }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credenciales de prueba -->
+        <div class="test-credentials">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <i class="fas fa-info-circle text-blue-500 text-lg"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-blue-800 mb-2">Credenciales de prueba:</p>
+              <div class="text-xs text-blue-700 space-y-1">
+                <div class="bg-blue-100 rounded-lg p-2">
+                  <p><span class="font-semibold">Cliente:</span> cliente&#64;test.com</p>
+                  <p><span class="font-semibold">Contraseña:</span> cualquiera</p>
+                </div>
+                <div class="bg-blue-100 rounded-lg p-2">
+                  <p><span class="font-semibold">Negocio:</span> negocio&#64;test.com</p>
+                  <p><span class="font-semibold">Contraseña:</span> cualquiera</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón de submit -->
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="login-button">
+          <span class="login-button-content">
+            <span *ngIf="isLoading" class="login-spinner">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
+            <i *ngIf="!isLoading" class="fas fa-sign-in-alt mr-2"></i>
+            {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+          </span>
+          <div class="login-button-bg"></div>
+        </button>
+
+        <!-- Link a registro -->
+        <div class="text-center pt-4 border-t border-gray-200">
+          <p class="text-sm text-gray-600">
+            ¿No tienes una cuenta?
+            <a routerLink="/auth/register" class="register-link">
+              <i class="fas fa-user-plus mr-1"></i>
+              Regístrate aquí
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center">
+      <p class="text-xs text-gray-500">
+        © 2024 AgendaPyme - Digitaliza tu negocio
+      </p>
+    </div>
+  </div>
+</div>

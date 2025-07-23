@@ -1,0 +1,353 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-section">
+          <div class="app-logo">
+            <i class="fas fa-store"></i>
+          </div>
+          <h1 class="app-title">AgendaPyme</h1>
+        </div>
+        <div class="user-info">
+          <span class="user-badge user-badge--negocio">Negocio</span>
+          <span class="user-name">{{currentUser?.nombreNegocio || currentUser?.nombre}}</span>
+        </div>
+      </div>
+      <button (click)="logout()" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Cerrar Sesión</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="dashboard-content">
+      
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card stat-card--primary">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-day"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{stats.citasHoy}}</div>
+            <div class="stat-label">Citas Hoy</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card--warning">
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{stats.citasPendientes}}</div>
+            <div class="stat-label">Pendientes</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card--success">
+          <div class="stat-icon">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">S/ {{stats.ingresosSemana}}</div>
+            <div class="stat-label">Ingresos Semana</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card--info">
+          <div class="stat-icon">
+            <i class="fas fa-concierge-bell"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{stats.serviciosActivos}}</div>
+            <div class="stat-label">Servicios Activos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid Principal -->
+      <div class="main-grid">
+        
+        <!-- Citas de Hoy -->
+        <div class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-calendar-day mr-2"></i>
+              Citas de Hoy
+            </h2>
+            <span class="date-badge">{{formatearFecha(fechaHoy)}}</span>
+          </div>
+
+          <div class="section-content">
+            <div *ngIf="citasHoy.length === 0" class="empty-state">
+              <i class="fas fa-calendar-check text-4xl text-gray-400 mb-3"></i>
+              <p class="empty-text">No hay citas programadas para hoy</p>
+            </div>
+
+            <div *ngIf="citasHoy.length > 0" class="citas-list">
+              <div *ngFor="let cita of citasHoy" class="cita-item">
+                <div class="cita-time">
+                  <div class="time-display">{{cita.hora}}</div>
+                  <div class="duration-display">{{cita.duracion}}min</div>
+                </div>
+                
+                <div class="cita-info">
+                  <h4 class="cita-service">{{cita.notas}}</h4>
+                  <p class="cita-client">Cliente ID: {{cita.clienteId}}</p>
+                  <div class="cita-details">
+                    <span class="cita-price">
+                      <i class="fas fa-dollar-sign mr-1"></i>
+                      S/ {{cita.precio}}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="cita-status">
+                  <span [class]="'status-badge ' + getEstadoClass(cita.estado)">
+                    {{cita.estado}}
+                  </span>
+                </div>
+
+                <div class="cita-actions">
+                  <button 
+                    *ngIf="cita.estado === 'pendiente'"
+                    (click)="confirmarCita(cita)" 
+                    class="cita-btn cita-btn--confirm">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button 
+                    *ngIf="cita.estado === 'confirmada'"
+                    (click)="completarCita(cita)" 
+                    class="cita-btn cita-btn--complete">
+                    <i class="fas fa-check-double"></i>
+                  </button>
+                  <button 
+                    *ngIf="cita.estado !== 'completada' && cita.estado !== 'cancelada'"
+                    (click)="cancelarCita(cita)" 
+                    class="cita-btn cita-btn--cancel">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gestión de Servicios -->
+        <div class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-concierge-bell mr-2"></i>
+              Mis Servicios
+            </h2>
+            <button (click)="mostrarNuevoServicio()" class="action-btn action-btn--primary">
+              <i class="fas fa-plus mr-1"></i>
+              Añadir
+            </button>
+          </div>
+
+          <div class="section-content">
+            <div *ngIf="servicios.length === 0" class="empty-state">
+              <i class="fas fa-plus-circle text-4xl text-gray-400 mb-3"></i>
+              <p class="empty-text">No tienes servicios configurados</p>
+              <button (click)="mostrarNuevoServicio()" class="empty-action">
+                Crear primer servicio
+              </button>
+            </div>
+
+            <div *ngIf="servicios.length > 0" class="servicios-list">
+              <div *ngFor="let servicio of servicios" class="servicio-item">
+                <div class="servicio-info">
+                  <h4 class="servicio-name">{{servicio.nombre}}</h4>
+                  <p class="servicio-category">{{servicio.categoria}}</p>
+                  <p class="servicio-description">{{servicio.descripcion}}</p>
+                </div>
+
+                <div class="servicio-details">
+                  <div class="servicio-price">S/ {{servicio.precio}}</div>
+                  <div class="servicio-duration">{{servicio.duracion}}min</div>
+                </div>
+
+                <div class="servicio-status">
+                  <span [class]="'status-badge ' + (servicio.activo ? 'status-activo' : 'status-inactivo')">
+                    {{servicio.activo ? 'Activo' : 'Inactivo'}}
+                  </span>
+                </div>
+
+                <div class="servicio-actions">
+                  <button (click)="editarServicio(servicio)" class="servicio-btn servicio-btn--edit">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button (click)="toggleServicioActivo(servicio)" class="servicio-btn servicio-btn--toggle">
+                    <i [class]="servicio.activo ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                  <button (click)="eliminarServicio(servicio)" class="servicio-btn servicio-btn--delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Citas Pendientes -->
+        <div class="section-card section-card--full">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-clock mr-2"></i>
+              Citas Pendientes de Confirmación
+            </h2>
+          </div>
+
+          <div class="section-content">
+            <div *ngIf="citasPendientes.length === 0" class="empty-state">
+              <i class="fas fa-check-circle text-4xl text-gray-400 mb-3"></i>
+              <p class="empty-text">No hay citas pendientes</p>
+            </div>
+
+            <div *ngIf="citasPendientes.length > 0" class="pendientes-table">
+              <div class="table-header">
+                <div class="th th--service">Servicio</div>
+                <div class="th th--date">Fecha</div>
+                <div class="th th--time">Hora</div>
+                <div class="th th--client">Cliente</div>
+                <div class="th th--actions">Acciones</div>
+              </div>
+
+              <div class="table-body">
+                <div *ngFor="let cita of citasPendientes" class="table-row">
+                  <div class="td td--service">{{cita.notas}}</div>
+                  <div class="td td--date">{{formatearFecha(cita.fecha)}}</div>
+                  <div class="td td--time">{{cita.hora}}</div>
+                  <div class="td td--client">Cliente {{cita.clienteId}}</div>
+                  <div class="td td--actions">
+                    <button (click)="confirmarCita(cita)" class="table-btn table-btn--confirm">
+                      <i class="fas fa-check mr-1"></i>
+                      Confirmar
+                    </button>
+                    <button (click)="cancelarCita(cita)" class="table-btn table-btn--cancel">
+                      <i class="fas fa-times mr-1"></i>
+                      Rechazar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Formulario de Servicio -->
+  <div *ngIf="mostrarFormServicio" class="modal-overlay" (click)="cancelarFormServicio()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fas fa-concierge-bell mr-2"></i>
+          {{editandoServicio ? 'Editar Servicio' : 'Nuevo Servicio'}}
+        </h3>
+        <button (click)="cancelarFormServicio()" class="modal-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="guardarServicio()" class="service-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nombre" class="form-label">Nombre del Servicio *</label>
+              <input
+                id="nombre"
+                name="nombre"
+                type="text"
+                [(ngModel)]="nuevoServicio.nombre"
+                class="form-input"
+                placeholder="Ej: Corte y Peinado"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="categoria" class="form-label">Categoría *</label>
+              <select
+                id="categoria"
+                name="categoria"
+                [(ngModel)]="nuevoServicio.categoria"
+                class="form-input"
+                required>
+                <option value="">Seleccionar categoría</option>
+                <option *ngFor="let cat of categorias" [value]="cat">{{cat}}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              [(ngModel)]="nuevoServicio.descripcion"
+              class="form-input"
+              rows="3"
+              placeholder="Describe el servicio..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="precio" class="form-label">Precio (S/) *</label>
+              <input
+                id="precio"
+                name="precio"
+                type="number"
+                [(ngModel)]="nuevoServicio.precio"
+                class="form-input"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="duracion" class="form-label">Duración (min) *</label>
+              <input
+                id="duracion"
+                name="duracion"
+                type="number"
+                [(ngModel)]="nuevoServicio.duracion"
+                class="form-input"
+                min="15"
+                step="15"
+                placeholder="30"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-checkbox">
+              <input
+                type="checkbox"
+                [(ngModel)]="nuevoServicio.activo"
+                name="activo">
+              <span class="checkbox-mark"></span>
+              Servicio activo (visible para clientes)
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" (click)="cancelarFormServicio()" class="btn btn--secondary">
+              Cancelar
+            </button>
+            <button type="submit" [disabled]="!validarServicio()" class="btn btn--primary">
+              <i class="fas fa-save mr-1"></i>
+              {{editandoServicio ? 'Actualizar' : 'Crear'}} Servicio
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

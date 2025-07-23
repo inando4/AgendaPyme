@@ -1,0 +1,275 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <!-- Logo y título -->
+    <div class="text-center">
+      <div class="mx-auto h-16 w-16 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+        <i class="fas fa-user-plus text-white text-2xl"></i>
+      </div>
+      <h2 class="text-4xl font-bold text-gray-900 mb-2">
+        Únete a AgendaPyme
+      </h2>
+      <p class="text-gray-600">
+        Crea tu cuenta y digitaliza tu negocio
+      </p>
+    </div>
+
+    <!-- Selector de tipo de usuario -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1">
+      <div class="flex space-x-1">
+        <button
+          type="button"
+          (click)="switchUserType('cliente')"
+          [class]="registerData.tipo === 'cliente' ? 'user-type-active' : 'user-type-inactive'"
+          class="user-type-btn">
+          <i class="fas fa-user text-lg"></i>
+          <span class="font-medium">Cliente</span>
+        </button>
+        <button
+          type="button"
+          (click)="switchUserType('negocio')"
+          [class]="registerData.tipo === 'negocio' ? 'user-type-active' : 'user-type-inactive'"
+          class="user-type-btn">
+          <i class="fas fa-store text-lg"></i>
+          <span class="font-medium">Negocio</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+      <form class="space-y-6" (ngSubmit)="onSubmit()">
+        
+        <!-- Campos básicos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre -->
+          <div class="form-group">
+            <label for="nombre" class="form-label">
+              <i class="fas fa-user mr-2 text-gray-400"></i>
+              Nombre *
+            </label>
+            <input
+              id="nombre"
+              name="nombre"
+              type="text"
+              required
+              [(ngModel)]="registerData.nombre"
+              class="form-input"
+              placeholder="Tu nombre">
+          </div>
+
+          <!-- Apellido -->
+          <div class="form-group">
+            <label for="apellido" class="form-label">
+              <i class="fas fa-user mr-2 text-gray-400"></i>
+              Apellido *
+            </label>
+            <input
+              id="apellido"
+              name="apellido"
+              type="text"
+              required
+              [(ngModel)]="registerData.apellido"
+              class="form-input"
+              placeholder="Tu apellido">
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-label">
+            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+            Correo electrónico *
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            [(ngModel)]="registerData.email"
+            class="form-input"
+            placeholder="correo&#64;ejemplo.com">
+        </div>
+
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="telefono" class="form-label">
+            <i class="fas fa-phone mr-2 text-gray-400"></i>
+            Teléfono *
+          </label>
+          <input
+            id="telefono"
+            name="telefono"
+            type="tel"
+            required
+            [(ngModel)]="registerData.telefono"
+            class="form-input"
+            placeholder="987654321">
+        </div>
+
+        <!-- Contraseña -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="form-group">
+            <label for="password" class="form-label">
+              <i class="fas fa-lock mr-2 text-gray-400"></i>
+              Contraseña *
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              [(ngModel)]="registerData.password"
+              class="form-input"
+              placeholder="••••••••">
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label">
+              <i class="fas fa-lock mr-2 text-gray-400"></i>
+              Confirmar *
+            </label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              [(ngModel)]="confirmPassword"
+              class="form-input"
+              placeholder="••••••••">
+          </div>
+        </div>
+
+        <!-- Campos específicos para negocio -->
+        <div *ngIf="registerData.tipo === 'negocio'" class="business-fields">
+          <div class="border-t border-gray-200 pt-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-store mr-2 text-blue-600"></i>
+              Información del Negocio
+            </h3>
+
+            <!-- Nombre del negocio -->
+            <div class="form-group">
+              <label for="nombreNegocio" class="form-label">
+                <i class="fas fa-building mr-2 text-gray-400"></i>
+                Nombre del negocio *
+              </label>
+              <input
+                id="nombreNegocio"
+                name="nombreNegocio"
+                type="text"
+                [(ngModel)]="registerData.nombreNegocio"
+                class="form-input"
+                placeholder="Ej: Peluquería Bella">
+            </div>
+
+            <!-- Categoría -->
+            <div class="form-group">
+              <label for="categoria" class="form-label">
+                <i class="fas fa-tags mr-2 text-gray-400"></i>
+                Categoría *
+              </label>
+              <select
+                id="categoria"
+                name="categoria"
+                [(ngModel)]="registerData.categoria"
+                class="form-input">
+                <option value="">Selecciona una categoría</option>
+                <option *ngFor="let categoria of categorias" [value]="categoria">
+                  {{ categoria }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Dirección -->
+            <div class="form-group">
+              <label for="direccion" class="form-label">
+                <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                Dirección *
+              </label>
+              <input
+                id="direccion"
+                name="direccion"
+                type="text"
+                [(ngModel)]="registerData.direccion"
+                class="form-input"
+                placeholder="Av. Principal 123, Lima">
+            </div>
+
+            <!-- Descripción -->
+            <div class="form-group">
+              <label for="descripcion" class="form-label">
+                <i class="fas fa-file-text mr-2 text-gray-400"></i>
+                Descripción (opcional)
+              </label>
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                rows="3"
+                [(ngModel)]="registerData.descripcion"
+                class="form-input resize-none"
+                placeholder="Describe los servicios que ofreces..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje de éxito -->
+        <div *ngIf="successMessage" class="success-alert">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <i class="fas fa-check-circle text-green-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-green-800">{{ successMessage }}</p>
+              <p class="text-xs text-green-600 mt-1">Redirigiendo al login...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div *ngIf="errorMessage" class="error-alert">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-red-800">{{ errorMessage }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón de submit -->
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="register-button">
+          <span class="register-button-content">
+            <span *ngIf="isLoading" class="register-spinner">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
+            <i *ngIf="!isLoading" class="fas fa-user-plus mr-2"></i>
+            {{ isLoading ? 'Creando cuenta...' : 'Crear Cuenta' }}
+          </span>
+          <div class="register-button-bg"></div>
+        </button>
+
+        <!-- Link a login -->
+        <div class="text-center pt-4 border-t border-gray-200">
+          <p class="text-sm text-gray-600">
+            ¿Ya tienes una cuenta?
+            <a routerLink="/auth/login" class="login-link">
+              <i class="fas fa-sign-in-alt mr-1"></i>
+              Inicia sesión aquí
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center">
+      <p class="text-xs text-gray-500">
+        © 2024 AgendaPyme - Digitaliza tu negocio
+      </p>
+    </div>
+  </div>
+</div>

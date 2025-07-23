@@ -1,0 +1,170 @@
+/* Estilos específicos para el componente de registro usando Tailwind */
+@import "tailwindcss";
+
+/* === BOTONES DE TIPO DE USUARIO === */
+.user-type-btn {
+  @apply flex-1 flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 cursor-pointer;
+}
+
+.user-type-active {
+  @apply bg-blue-600 text-white shadow-lg transform scale-105;
+}
+
+.user-type-inactive {
+  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
+}
+
+/* === FORMULARIO === */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply flex items-center text-sm font-medium text-gray-700;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 
+         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+         transition-all duration-200 bg-gray-50 focus:bg-white;
+}
+
+.form-input:focus {
+  @apply shadow-md;
+}
+
+/* === CAMPOS DE NEGOCIO === */
+.business-fields {
+  /* CAMBIAR ESTA LÍNEA - quitar animate-fadeIn y usar CSS puro */
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* === BOTÓN DE REGISTRO PROFESIONAL === */
+.register-button {
+  @apply relative w-full h-12 rounded-lg font-semibold text-white 
+         disabled:opacity-50 disabled:cursor-not-allowed 
+         transition-all duration-300 overflow-hidden
+         shadow-lg hover:shadow-xl
+         transform hover:-translate-y-0.5 active:translate-y-0;
+}
+
+.register-button-content {
+  @apply relative z-10 flex items-center justify-center h-full;
+}
+
+.register-button-bg {
+  @apply absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 
+         transition-all duration-300;
+}
+
+.register-button:hover .register-button-bg {
+  @apply from-green-700 to-green-800;
+}
+
+.register-button:disabled .register-button-bg {
+  @apply from-gray-400 to-gray-500;
+}
+
+.register-spinner {
+  @apply mr-2 animate-spin;
+}
+
+/* === ALERTAS === */
+.success-alert {
+  @apply bg-green-50 border border-green-200 rounded-lg p-4 shadow-sm;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.error-alert {
+  @apply bg-red-50 border border-red-200 rounded-lg p-4 shadow-sm;
+  animation: shake 0.5s ease-in-out;
+}
+
+/* === ENLACES === */
+.login-link {
+  @apply font-medium text-blue-600 hover:text-blue-700 
+         transition-colors duration-200 ml-1 
+         hover:underline;
+}
+
+/* === ANIMACIONES PERSONALIZADAS === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* === EFECTOS ADICIONALES === */
+.form-input:hover {
+  @apply border-blue-300;
+}
+
+.user-type-btn:hover {
+  @apply transform scale-102;
+}
+
+/* === TEXTAREA === */
+textarea.form-input {
+  @apply resize-none;
+}
+
+/* === SELECT === */
+select.form-input {
+  @apply cursor-pointer;
+}
+
+/* === RESPONSIVIDAD === */
+@media (max-width: 640px) {
+  .user-type-btn {
+    @apply py-2 px-3 text-sm;
+  }
+  
+  .form-input {
+    @apply py-2.5;
+  }
+  
+  .register-button {
+    @apply h-11;
+  }
+}
+
+/* === MEJORAS VISUALES === */
+.bg-gradient-to-br {
+  background-image: linear-gradient(
+    135deg,
+    #eff6ff 0%,
+    #dbeafe 25%,
+    #bfdbfe 50%,
+    #93c5fd 100%
+  );
+}
+
+/* Efecto glassmorphism para las tarjetas */
+.bg-white {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Hover effect para inputs */
+.form-input:focus {
+  box-shadow: 
+    0 0 0 3px rgba(59, 130, 246, 0.1),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
