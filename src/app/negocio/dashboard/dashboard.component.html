@@ -68,8 +68,44 @@
         </div>
       </div>
 
+
+        
+      
       <!-- Grid Principal -->
       <div class="main-grid">
+
+        <!-- AGREGAR ESTA NUEVA SECCIÓN -->
+        <!-- Código QR y Link de Reservas -->
+        <div class="section-card section-card--qr">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-qrcode mr-2"></i>
+              Código QR para Reservas
+            </h2>
+            <button (click)="abrirModalQR()" class="action-btn action-btn--primary">
+              <i class="fas fa-qrcode mr-1"></i>
+              Ver QR
+            </button>
+          </div>
+
+          <div class="section-content">
+            <div class="qr-info">
+              <div class="qr-description">
+                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                <p class="qr-text">
+                  Comparte este código QR con tus clientes para que puedan agendar citas directamente desde su celular.
+                </p>
+              </div>
+              
+              <div class="qr-actions">
+                <button (click)="abrirModalQR()" class="qr-btn qr-btn--view">
+                  <i class="fas fa-eye mr-2"></i>
+                  Ver Código QR
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
         
         <!-- Citas de Hoy -->
         <div class="section-card">
@@ -350,4 +386,99 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal Código QR -->
+  <div *ngIf="mostrarModalQR" class="modal-overlay" (click)="cerrarModalQR()">
+    <div class="qr-modal-content" (click)="$event.stopPropagation()">
+      <div class="qr-modal-header">
+        <h3 class="qr-modal-title">
+          <i class="fas fa-qrcode mr-2"></i>
+          Código QR para Reservas
+        </h3>
+        <button (click)="cerrarModalQR()" class="modal-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="qr-modal-body">
+        <!-- Código QR -->
+        <div class="qr-container">
+          <div *ngIf="qrCodeDataURL" class="qr-image-container">
+            <img [src]="qrCodeDataURL" alt="Código QR" class="qr-image">
+            <p class="qr-caption">
+              <i class="fas fa-mobile-alt mr-1"></i>
+              Escanea con tu celular
+            </p>
+          </div>
+          
+          <div *ngIf="!qrCodeDataURL" class="qr-loading">
+            <i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-3"></i>
+            <p>Generando código QR...</p>
+          </div>
+        </div>
+
+        <!-- Información del negocio -->
+        <div class="qr-business-info">
+          <h4 class="business-name">{{datosNegocio?.nombre}}</h4>
+          <p class="business-category">{{datosNegocio?.categoria}}</p>
+        </div>
+
+        <!-- Link directo -->
+        <div class="qr-link-section">
+          <label class="qr-label">Link directo:</label>
+          <div class="qr-link-container">
+            <input 
+              type="text" 
+              [value]="linkReserva" 
+              readonly 
+              class="qr-link-input">
+            <button 
+              (click)="copiarLink()" 
+              [disabled]="copiandoLink"
+              class="qr-copy-btn">
+              <i *ngIf="!copiandoLink" class="fas fa-copy"></i>
+              <i *ngIf="copiandoLink" class="fas fa-spinner fa-spin"></i>
+              {{copiandoLink ? 'Copiando...' : 'Copiar'}}
+            </button>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="qr-actions-grid">
+          <button (click)="descargarQR()" class="qr-action-btn qr-action-btn--download">
+            <i class="fas fa-download mr-2"></i>
+            Descargar QR
+          </button>
+          
+          <button (click)="copiarLink()" class="qr-action-btn qr-action-btn--share">
+            <i class="fas fa-share-alt mr-2"></i>
+            Compartir Link
+          </button>
+        </div>
+
+        <!-- Instrucciones -->
+        <div class="qr-instructions">
+          <h5 class="instructions-title">
+            <i class="fas fa-lightbulb mr-2"></i>
+            ¿Cómo usar?
+          </h5>
+          <ul class="instructions-list">
+            <li>
+              <i class="fas fa-print mr-2"></i>
+              Imprime el código QR y colócalo en un lugar visible
+            </li>
+            <li>
+              <i class="fas fa-mobile-alt mr-2"></i>
+              Los clientes escanean con su celular
+            </li>
+            <li>
+              <i class="fas fa-calendar-plus mr-2"></i>
+              Se abre la página de reservas automáticamente
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

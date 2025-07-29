@@ -546,3 +546,195 @@
 .modal-content {
   @apply overscroll-contain;
 }
+
+/* === SECCIÓN QR === */
+.section-card--qr {
+  @apply bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200;
+}
+
+.qr-info {
+  @apply space-y-4;
+}
+
+.qr-description {
+  @apply flex items-start space-x-2;
+}
+
+.qr-text {
+  @apply text-gray-600 text-sm sm:text-base leading-relaxed;
+}
+
+.qr-actions {
+  @apply flex justify-center;
+}
+
+.qr-btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center text-sm;
+  @apply sm:px-6 sm:py-3 sm:text-base;
+}
+
+.qr-btn--view {
+  @apply bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md;
+}
+
+/* === MODAL QR === */
+.qr-modal-content {
+  @apply bg-white rounded-lg shadow-xl w-full max-w-md mx-auto max-h-screen overflow-y-auto;
+  @apply sm:max-w-lg;
+}
+
+.qr-modal-header {
+  @apply flex justify-between items-center p-4 border-b border-gray-200;
+  @apply sm:p-6;
+}
+
+.qr-modal-title {
+  @apply text-lg font-bold text-gray-900;
+  @apply sm:text-xl;
+}
+
+.qr-modal-body {
+  @apply p-4 space-y-6;
+  @apply sm:p-6;
+}
+
+/* === CONTENEDOR QR === */
+.qr-container {
+  @apply text-center;
+}
+
+.qr-image-container {
+  @apply space-y-3;
+}
+
+.qr-image {
+  @apply mx-auto rounded-lg shadow-sm border border-gray-200;
+  @apply w-64 h-64;
+  @apply sm:w-72 sm:h-72;
+}
+
+.qr-caption {
+  @apply text-gray-600 text-sm flex items-center justify-center;
+}
+
+.qr-loading {
+  @apply py-8 text-center text-gray-600;
+}
+
+/* === INFO DEL NEGOCIO === */
+.qr-business-info {
+  @apply text-center space-y-1 py-4 border-y border-gray-200;
+}
+
+.business-name {
+  @apply font-bold text-gray-900 text-lg;
+}
+
+.business-category {
+  @apply text-blue-600 text-sm;
+}
+
+/* === SECCIÓN LINK === */
+.qr-link-section {
+  @apply space-y-2;
+}
+
+.qr-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.qr-link-container {
+  @apply flex space-x-2;
+}
+
+.qr-link-input {
+  @apply flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.qr-copy-btn {
+  @apply px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors;
+  @apply hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply flex items-center space-x-1;
+}
+
+/* === ACCIONES GRID === */
+.qr-actions-grid {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.qr-action-btn {
+  @apply px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center text-sm;
+  @apply hover:shadow-md;
+}
+
+.qr-action-btn--download {
+  @apply bg-green-600 text-white hover:bg-green-700;
+}
+
+.qr-action-btn--share {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+/* === INSTRUCCIONES === */
+.qr-instructions {
+  @apply bg-gray-50 rounded-lg p-4 space-y-3;
+}
+
+.instructions-title {
+  @apply font-medium text-gray-900 text-sm flex items-center;
+}
+
+.instructions-list {
+  @apply space-y-2 text-sm text-gray-600;
+}
+
+.instructions-list li {
+  @apply flex items-start space-x-2;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 640px) {
+  .qr-actions-grid {
+    @apply grid-cols-1 space-y-2;
+  }
+  
+  .qr-link-container {
+    @apply flex-col space-y-2 space-x-0;
+  }
+  
+  .qr-copy-btn {
+    @apply w-full justify-center;
+  }
+}
+
+/* === MEJORAS TÁCTILES === */
+.qr-btn,
+.qr-action-btn,
+.qr-copy-btn {
+  @apply touch-manipulation;
+}
+
+/* === FOCUS STATES === */
+.qr-btn:focus,
+.qr-action-btn:focus,
+.qr-copy-btn:focus,
+.qr-link-input:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* === ANIMACIONES === */
+@keyframes qrFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.qr-modal-content {
+  animation: qrFadeIn 0.3s ease-out;
+}
