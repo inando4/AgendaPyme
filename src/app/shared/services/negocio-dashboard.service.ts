@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Cita, Servicio } from '../models/cita';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +10,12 @@ import { Cita, Servicio } from '../models/cita';
 export class NegocioDashboardService {
   private serviciosSubject = new BehaviorSubject<Servicio[]>([]);
   public servicios$ = this.serviciosSubject.asObservable();
+
+  // AGREGAR ESTOS SUBJECTS PARA CITAS
+  private citasSubject = new BehaviorSubject<Cita[]>([]);
+  public citas$ = this.citasSubject.asObservable();
+
+  private localStorageService = inject(LocalStorageService);
 
   // Datos mock de servicios expandidos
   private mockServicios: Servicio[] = [
@@ -53,10 +61,10 @@ export class NegocioDashboardService {
     }
   ];
 
-  // Datos mock de citas del negocio
+  // Datos mock de citas del negocio (como respaldo)
   private mockCitasNegocio: Cita[] = [
     {
-      id: '1',
+      id: '100',
       clienteId: '1',
       negocioId: '2',
       servicioId: '1',
@@ -68,7 +76,7 @@ export class NegocioDashboardService {
       duracion: 60
     },
     {
-      id: '2',
+      id: '101',
       clienteId: '3',
       negocioId: '2',
       servicioId: '2',
@@ -78,35 +86,137 @@ export class NegocioDashboardService {
       notas: 'Tinte Completo',
       precio: 45.00,
       duracion: 120
-    },
-    {
-      id: '3',
-      clienteId: '1',
-      negocioId: '2',
-      servicioId: '3',
-      fecha: new Date(Date.now() + 86400000), // Mañana
-      hora: '14:00',
-      estado: 'confirmada',
-      notas: 'Manicure',
-      precio: 15.00,
-      duracion: 45
-    },
-    {
-      id: '4',
-      clienteId: '4',
-      negocioId: '2',
-      servicioId: '1',
-      fecha: new Date(Date.now() - 86400000), // Ayer
-      hora: '16:00',
-      estado: 'completada',
-      notas: 'Corte y Peinado',
-      precio: 25.00,
-      duracion: 60
     }
   ];
 
   constructor() {
     this.serviciosSubject.next(this.mockServicios);
+    console.log('NegocioDashboard: Inicializando...'); // DEBUG
+    // CARGAR CITAS DESDE LOCALSTORAGE
+    this.cargarCitasDesdeStorage();
+  }
+
+  // CORREGIR COMPLETAMENTE ESTE MÉTODO
+  private cargarCitasDesdeStorage(): void {
+    console.log('NegocioDashboard: Intentando cargar citas desde localStorage...'); // DEBUG
+    
+    // Obtener todas las citas desde localStorage
+    const citasGuardadas = this.localStorageService.getCitas();
+    console.log('NegocioDashboard: Citas encontradas en localStorage:', citasGuardadas); // DEBUG
+    
+    if (citasGuardadas.length > 0) {
+      // Usar todas las citas (no filtrar por negocio específico aquí)
+      // porque necesitamos todas las citas para que los negocios las vean
+      this.citasSubject.next(citasGuardadas);
+      console.log('NegocioDashboard: Citas cargadas exitosamente:', citasGuardadas.length); // DEBUG
+    } else {
+      // Si no hay citas guardadas, inicializar con datos mock
+      console.log('NegocioDashboard: No hay citas en localStorage, usando datos mock'); // DEBUG
+      this.localStorageService.setCitas(this.mockCitasNegocio);
+      this.citasSubject.next(this.mockCitasNegocio);
+    }
+    
+    // Verificar qué citas tiene cada negocio
+    const todasLasCitas = this.citasSubject.value;
+    console.log('NegocioDashboard: Resumen de citas por negocio:'); // DEBUG
+    console.log('  - Negocio 1:', todasLasCitas.filter(c => c.negocioId === '1').length, 'citas'); // DEBUG
+    console.log('  - Negocio 2:', todasLasCitas.filter(c => c.negocioId === '2').length, 'citas'); // DEBUG
+    console.log('  - Negocio 3:', todasLasCitas.filter(c => c.negocioId === '3').length, 'citas'); // DEBUG
+  }
+
+  // ACTUALIZAR MÉTODOS DE CITAS PARA USAR EL SUBJECT Y LOCALSTORAGE
+  getCitasByNegocio(negocioId: string): Observable<Cita[]> {
+    return this.citas$.pipe(
+      map(citas => {
+        const citasDelNegocio = citas.filter(c => c.negocioId === negocioId);
+        console.log(`NegocioDashboard: Citas para negocio ${negocioId}:`, citasDelNegocio); // DEBUG
+        return citasDelNegocio;
+      })
+    );
+  }
+
+  getCitasDelDia(negocioId: string, fecha: Date = new Date()): Observable<Cita[]> {
+    return this.citas$.pipe(
+      map(citas => {
+        const fechaStr = fecha.toDateString();
+        const citasDelDia = citas
+          .filter(c => c.negocioId === negocioId && c.fecha.toDateString() === fechaStr)
+          .sort((a, b) => a.hora.localeCompare(b.hora));
+        console.log(`NegocioDashboard: Citas del día ${fechaStr} para negocio ${negocioId}:`, citasDelDia); // DEBUG
+        return citasDelDia;
+      })
+    );
+  }
+
+  getCitasPendientes(negocioId: string): Observable<Cita[]> {
+    return this.citas$.pipe(
+      map(citas => {
+        const citasPendientes = citas.filter(c => c.negocioId === negocioId && c.estado === 'pendiente');
+        console.log(`NegocioDashboard: Citas pendientes para negocio ${negocioId}:`, citasPendientes); // DEBUG
+        return citasPendientes;
+      })
+    );
+  }
+
+  // ACTUALIZAR ESTE MÉTODO CRÍTICO
+  agregarCitaPendiente(cita: Cita): void {
+    console.log('NegocioDashboard: Agregando cita pendiente:', cita); // DEBUG
+    
+    // Obtener citas actuales del subject
+    const citasActuales = this.citasSubject.value;
+    
+    // Agregar la nueva cita
+    const citasActualizadas = [...citasActuales, cita];
+    
+    // Actualizar el subject
+    this.citasSubject.next(citasActualizadas);
+    
+    // SINCRONIZAR CON LOCALSTORAGE
+    this.localStorageService.setCitas(citasActualizadas);
+    
+    console.log('NegocioDashboard: Cita agregada. Total citas:', citasActualizadas.length); // DEBUG
+    console.log('NegocioDashboard: Citas pendientes para negocio', cita.negocioId, ':', 
+      citasActualizadas.filter(c => c.negocioId === cita.negocioId && c.estado === 'pendiente').length); // DEBUG
+  }
+
+  // ACTUALIZAR MÉTODOS QUE MODIFICAN CITAS
+  confirmarCita(citaId: string): Observable<boolean> {
+    const citasActuales = this.citasSubject.value;
+    const cita = citasActuales.find(c => c.id === citaId);
+    if (cita) {
+      cita.estado = 'confirmada';
+      this.citasSubject.next([...citasActuales]);
+      this.localStorageService.setCitas(citasActuales); // SINCRONIZAR
+      console.log('Cita confirmada y sincronizada:', cita);
+      return of(true);
+    }
+    return of(false);
+  }
+
+  completarCita(citaId: string): Observable<boolean> {
+    const citasActuales = this.citasSubject.value;
+    const cita = citasActuales.find(c => c.id === citaId);
+    if (cita) {
+      cita.estado = 'completada';
+      this.citasSubject.next([...citasActuales]);
+      this.localStorageService.setCitas(citasActuales); // SINCRONIZAR
+      console.log('Cita completada y sincronizada:', cita);
+      return of(true);
+    }
+    return of(false);
+  }
+
+  cancelarCita(citaId: string): Observable<boolean> {
+    const citasActuales = this.citasSubject.value;
+    const cita = citasActuales.find(c => c.id === citaId);
+    if (cita) {
+      cita.estado = 'cancelada';
+      this.citasSubject.next([...citasActuales]);
+      this.localStorageService.setCitas(citasActuales); // SINCRONIZAR
+      console.log('Cita cancelada y sincronizada:', cita);
+      return of(true);
+    }
+    return of(false);
   }
 
   // Servicios del negocio
@@ -142,74 +252,22 @@ export class NegocioDashboardService {
     return of(false);
   }
 
-  // Citas del negocio
-  getCitasByNegocio(negocioId: string): Observable<Cita[]> {
-    const citas = this.mockCitasNegocio.filter(c => c.negocioId === negocioId);
-    return of(citas);
-  }
-
-  getCitasDelDia(negocioId: string, fecha: Date = new Date()): Observable<Cita[]> {
-    const fechaStr = fecha.toDateString();
-    const citasDelDia = this.mockCitasNegocio.filter(c => 
-      c.negocioId === negocioId && 
-      c.fecha.toDateString() === fechaStr
-    );
-    return of(citasDelDia.sort((a, b) => a.hora.localeCompare(b.hora)));
-  }
-
-  getCitasPendientes(negocioId: string): Observable<Cita[]> {
-    const pendientes = this.mockCitasNegocio.filter(c => 
-      c.negocioId === negocioId && 
-      c.estado === 'pendiente'
-    );
-    return of(pendientes);
-  }
-
-  confirmarCita(citaId: string): Observable<boolean> {
-    const cita = this.mockCitasNegocio.find(c => c.id === citaId);
-    if (cita) {
-      cita.estado = 'confirmada';
-      return of(true);
-    }
-    return of(false);
-  }
-
-  completarCita(citaId: string): Observable<boolean> {
-    const cita = this.mockCitasNegocio.find(c => c.id === citaId);
-    if (cita) {
-      cita.estado = 'completada';
-      return of(true);
-    }
-    return of(false);
-  }
-
-  cancelarCita(citaId: string): Observable<boolean> {
-    const cita = this.mockCitasNegocio.find(c => c.id === citaId);
-    if (cita) {
-      cita.estado = 'cancelada';
-      return of(true);
-    }
-    return of(false);
-  }
-
-  agregarCitaPendiente(cita: Cita): void {
-    this.mockCitasNegocio.push(cita);
-  }
-
   // Estadísticas
   getEstadisticas(negocioId: string): Observable<any> {
-    const citasNegocio = this.mockCitasNegocio.filter(c => c.negocioId === negocioId);
-    const hoy = new Date().toDateString();
-    
-    const stats = {
-      citasHoy: citasNegocio.filter(c => c.fecha.toDateString() === hoy).length,
-      citasPendientes: citasNegocio.filter(c => c.estado === 'pendiente').length,
-      ingresosSemana: citasNegocio
-        .filter(c => c.estado === 'completada')
-        .reduce((sum, c) => sum + c.precio, 0),
-      serviciosActivos: this.mockServicios.filter(s => s.negocioId === negocioId && s.activo).length
-    };
-
-    return of(stats);
+    return this.citas$.pipe(
+      map(citas => {
+        const citasNegocio = citas.filter(c => c.negocioId === negocioId);
+        const hoy = new Date().toDateString();
+        
+        return {
+          citasHoy: citasNegocio.filter(c => c.fecha.toDateString() === hoy).length,
+          citasPendientes: citasNegocio.filter(c => c.estado === 'pendiente').length,
+          ingresosSemana: citasNegocio
+            .filter(c => c.estado === 'completada')
+            .reduce((sum, c) => sum + c.precio, 0),
+          serviciosActivos: this.mockServicios.filter(s => s.negocioId === negocioId && s.activo).length
+        };
+      })
+    );
   }
 }

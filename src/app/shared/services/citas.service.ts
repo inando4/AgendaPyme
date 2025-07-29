@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core'; // AGREGAR inject aquí
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { Cita } from '../models/cita';
 import { map } from 'rxjs/operators';
+import { Cita } from '../models/cita';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,17 +11,19 @@ export class CitasService {
   private citasSubject = new BehaviorSubject<Cita[]>([]);
   public citas$ = this.citasSubject.asObservable();
 
-  // Datos mock para citas
+  private localStorageService = inject(LocalStorageService);
+
+  // Mock data de citas (como respaldo si no hay nada en localStorage)
   private mockCitas: Cita[] = [
     {
       id: '1',
-      clienteId: '1', // ID del cliente de prueba
+      clienteId: '1',
       negocioId: '1',
       servicioId: '1',
-      fecha: new Date(2024, 11, 25), // 25 de diciembre
+      fecha: new Date(Date.now() + 86400000), // Mañana
       hora: '10:00',
       estado: 'confirmada',
-      notas: 'Corte y peinado',
+      notas: 'Corte y Peinado',
       precio: 25.00,
       duracion: 60
     },
@@ -29,55 +32,57 @@ export class CitasService {
       clienteId: '1',
       negocioId: '2',
       servicioId: '2',
-      fecha: new Date(2024, 11, 28), // 28 de diciembre
-      hora: '15:30',
+      fecha: new Date(Date.now() + 172800000), // Pasado mañana
+      hora: '15:00',
       estado: 'pendiente',
-      notas: 'Limpieza dental',
+      notas: 'Limpieza Dental',
       precio: 80.00,
       duracion: 90
-    },
-    {
-      id: '3',
-      clienteId: '1',
-      negocioId: '1',
-      servicioId: '3',
-      fecha: new Date(2024, 11, 15), // 15 de diciembre (pasada)
-      hora: '09:00',
-      estado: 'completada',
-      notas: 'Manicure',
-      precio: 15.00,
-      duracion: 45
     }
   ];
 
   constructor() {
-    this.citasSubject.next(this.mockCitas); // AGREGAR ESTA LÍNEA
+    this.cargarCitasDesdeStorage();
   }
 
-  getCitasByCliente(clienteId: string): Observable<Cita[]> {
-    const citasCliente = this.mockCitas.filter(cita => cita.clienteId === clienteId);
-    return of(citasCliente);
+  private cargarCitasDesdeStorage(): void {
+    // Intentar cargar desde localStorage
+    const citasGuardadas = this.localStorageService.getCitas();
+    
+    if (citasGuardadas.length > 0) {
+      // Si hay citas guardadas, usarlas
+      this.citasSubject.next(citasGuardadas);
+      console.log('CitasService: Citas cargadas desde localStorage:', citasGuardadas.length);
+    } else {
+      // Si no hay citas guardadas, usar datos mock e inicializar localStorage
+      this.localStorageService.setCitas(this.mockCitas);
+      this.citasSubject.next(this.mockCitas);
+      console.log('CitasService: Inicializado con datos mock:', this.mockCitas.length);
+    }
   }
 
-  agregarCita(nuevaCita: Cita): void {
-    console.log('CitasService: Agregando nueva cita:', nuevaCita); // DEBUG
+  private sincronizarConStorage(): void {
     const citasActuales = this.citasSubject.value;
-    const citasActualizadas = [...citasActuales, nuevaCita];
-    this.citasSubject.next(citasActualizadas);
-    console.log('CitasService: Citas actualizadas:', citasActualizadas); // DEBUG
+    this.localStorageService.setCitas(citasActuales);
   }
 
   getProximasCitas(clienteId: string): Observable<Cita[]> {
     return this.citas$.pipe(
       map(citas => {
         const hoy = new Date();
-        return citas
-          .filter(cita => 
-            cita.clienteId === clienteId && 
-            cita.fecha >= hoy && 
-            (cita.estado === 'pendiente' || cita.estado === 'confirmada')
-          )
-          .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+        hoy.setHours(0, 0, 0, 0);
+        
+        const proximasCitas = citas.filter(cita => {
+          const fechaCita = new Date(cita.fecha);
+          fechaCita.setHours(0, 0, 0, 0);
+          
+          return cita.clienteId === clienteId && 
+                 fechaCita >= hoy && 
+                 (cita.estado === 'pendiente' || cita.estado === 'confirmada');
+        }).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+        
+        console.log('Próximas citas para cliente', clienteId, ':', proximasCitas.length);
+        return proximasCitas;
       })
     );
   }
@@ -85,9 +90,12 @@ export class CitasService {
   getCitasHistorial(clienteId: string): Observable<Cita[]> {
     return this.citas$.pipe(
       map(citas => {
-        return citas
+        const historial = citas
           .filter(cita => cita.clienteId === clienteId)
           .sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+        
+        console.log('Historial de citas para cliente', clienteId, ':', historial.length);
+        return historial;
       })
     );
   }
@@ -99,9 +107,28 @@ export class CitasService {
     if (cita) {
       cita.estado = 'cancelada';
       this.citasSubject.next([...citasActuales]);
+      this.sincronizarConStorage(); // SINCRONIZAR CON LOCALSTORAGE
+      console.log('Cita cancelada y sincronizada:', cita);
       return of(true);
     }
     
+    console.log('Cita no encontrada para cancelar:', citaId);
     return of(false);
+  }
+
+  agregarCita(nuevaCita: Cita): void {
+    console.log('CitasService: Agregando nueva cita:', nuevaCita);
+    const citasActuales = this.citasSubject.value;
+    const citasActualizadas = [...citasActuales, nuevaCita];
+    this.citasSubject.next(citasActualizadas);
+    this.sincronizarConStorage(); // SINCRONIZAR CON LOCALSTORAGE
+    console.log('CitasService: Cita agregada y sincronizada. Total:', citasActualizadas.length);
+  }
+
+  // Métodos adicionales para compatibilidad
+  getCitasByCliente(clienteId: string): Observable<Cita[]> {
+    return this.citas$.pipe(
+      map(citas => citas.filter(cita => cita.clienteId === clienteId))
+    );
   }
 }

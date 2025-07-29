@@ -1,9 +1,9 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core'; // AGREGAR inject aquí
 import { BehaviorSubject, Observable, of, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Cita, Servicio, Negocio } from '../models/cita';
-import { CitasService } from './citas.service'; // AGREGAR IMPORT
-import { NegocioDashboardService } from './negocio-dashboard.service'; // AGREGAR IMPORT
+import { CitasService } from './citas.service';
+import { NegocioDashboardService } from './negocio-dashboard.service';
 
 export interface HorarioDisponible {
   hora: string;
@@ -257,21 +257,22 @@ export class ReservasService {
   }
 
   // IMPLEMENTAR persistencia real
+  // VERIFICAR que este método esté completo
   private persistirNuevaCita(cita: Cita) {
-    console.log('Persistiendo nueva cita:', cita); // DEBUG
-    
-    // Agregar a CitasService para que aparezca en el dashboard del cliente
-    this.citasService.agregarCita(cita);
-    
-    // Negocio - AGREGAR ESTO
-    this.negocioDashboardService.agregarCitaPendiente(cita);
-    
-    // También emitir en el subject local
-    const citasActuales = this.reservasSubject.value;
-    this.reservasSubject.next([...citasActuales, cita]);
-    
-    console.log('Cita persistida exitosamente'); // DEBUG
-  }
+  console.log('ReservasService: Persistiendo nueva cita:', cita); // DEBUG
+  
+  // Agregar a CitasService para que aparezca en el dashboard del cliente
+  this.citasService.agregarCita(cita);
+  
+  // Agregar a NegocioDashboardService para que aparezca en el dashboard del negocio
+  this.negocioDashboardService.agregarCitaPendiente(cita);
+  
+  // También emitir en el subject local
+  const citasActuales = this.reservasSubject.value;
+  this.reservasSubject.next([...citasActuales, cita]);
+  
+  console.log('ReservasService: Cita persistida exitosamente en todos los servicios'); // DEBUG
+}
 
   // Obtener fechas disponibles (próximos 30 días)
   getFechasDisponibles(negocioId: string): Observable<Date[]> {

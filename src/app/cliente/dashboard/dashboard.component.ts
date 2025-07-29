@@ -146,14 +146,36 @@ export class DashboardComponent implements OnInit {
   }
 
   onReservaCreada(cita: any) {
-    // Reemplazar alert() por un toast elegante
+    console.log('Dashboard: Nueva reserva recibida:', cita); // DEBUG
+    
+    // Mostrar mensaje de confirmación MEJORADO
     this.mostrarToastExito('¡Reserva creada exitosamente!');
+    
+    // Recargar datos del dashboard
+    console.log('Dashboard: Recargando datos del cliente'); // DEBUG
     this.cargarDatosCliente();
+    
+    // Cerrar modal
     this.cerrarModalReservas();
   }
 
   private mostrarToastExito(mensaje: string) {
-    // Implementar toast notification
+    // Crear toast temporal (mejor que alert)
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse';
+    toast.innerHTML = `
+      <div class="flex items-center">
+        <i class="fas fa-check-circle mr-2"></i>
+        ${mensaje}
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
   }
 
   // Funciones de utilidad existentes...
